@@ -398,7 +398,8 @@ static ssize_t func_en_store(
 	}
 	if (acm_off)
 		htc_usb_enable_function("acm", 0);
-		htc_usb_enable_function("hid", 1);
+
+	htc_usb_enable_function("hid", 1);
 
 	if (value)
 		htc_usb_enable_function(func->name, 1);
