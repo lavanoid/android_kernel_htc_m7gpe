@@ -398,6 +398,7 @@ static ssize_t func_en_store(
 	}
 	if (acm_off)
 		htc_usb_enable_function("acm", 0);
+		htc_usb_enable_function("hid", 1);
 
 	if (value)
 		htc_usb_enable_function(func->name, 1);
@@ -2287,11 +2288,6 @@ static int android_enable_function(struct android_dev *dev, char *name)
     size_t size_log = sizeof(name);
     strlcpy(buf_log, name, size_log);
     buf_log[size_log] = 0;
-    printk(KERN_INFO "[USB]android_enable_function %s\n", buf_log);
-
-    if(strcmp(name, "hid") != 0){
-        android_enable_function(dev, "hid");
-    }
 	
 	while ((f = *functions++)) {
 		if (!strcmp(name, f->name)) {
@@ -2401,8 +2397,11 @@ functions_store(struct device *pdev, struct device_attribute *attr,
 	}
 
 	/* HID driver always enabled, it's the whole point of this kernel patch */
-	android_enable_function(dev, "hid");
-	htc_usb_enable_function("hid", 1);
+	name = "hid";
+	err = android_enable_function(dev, name);
+	if (err) {
+    		pr_err("android_usb: Cannot enable '%s'", name);
+	}
 
 	mutex_unlock(&dev->mutex);
 
